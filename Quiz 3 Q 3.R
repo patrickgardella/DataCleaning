@@ -30,12 +30,38 @@ if (!file.exists(fileName2)) {
   dateDownloaded <- date()
 }
 
-GDP <- read.csv(fileName, header=FALSE, skip=5)
+GDP <- read.csv(fileName, header=FALSE, stringsAsFactors=FALSE)
 colnames(GDP) <- c("CountryCode","Ranking","V3","Country","GDP","Footnotes", "V5", "V6", "V7", "V8")
-Stats <- read.csv(fileName2)
+GDP <- GDP[6:195,]
+GDP$Ranking <- as.integer(GDP$Ranking)
+GDP$GDP <- gsub(",", "", GDP$GDP)
+GDP$GDP <- as.integer(as.character(GDP$GDP))
 
-mergedData <- merge(GDP, Stats,by.x="CountryCode",by.y="CountryCode",all=TRUE)
+new <- GDP[order(GDP$GDP, decreasing = TRUE),]
+new2 <- GDP[order(GDP$Ranking, decreasing = FALSE),]
 
-keep <- c("CountryCode", "GDP")
+Stats <- read.csv(fileName2, stringsAsFactors=FALSE)
 
-md <- mergedData[keep]
+mergedData <- merge(GDP, Stats,by="CountryCode", all = FALSE)
+mergedData$GDP <- as.integer(as.character(mergedData$GDP))
+
+mergedDataSorted <- mergedData[order(mergedData$Ranking, decreasing = TRUE),]
+print("Question 3")
+print(mergedDataSorted[13,1:5])
+#    CountryCode Ranking V3             Country GDP
+#109         KNA     178 NA St. Kitts and Nevis 767
+
+print("Question 4")
+#### Question 4
+print(tapply(mergedData$Ranking,mergedData$Income.Group,mean, na.rm=TRUE))
+#                      High income: nonOECD    High income: OECD           Low income  Lower middle income 
+#NaN             91.91304             32.96667            133.72973            107.70370 
+#
+#Upper middle income 
+#92.13333 
+
+##### Question 5
+print("Question 5")
+mds <- mergedData[order(mergedData$GDP, decreasing = TRUE),]
+print(table(mds[1:38,]$Income.Group))
+
