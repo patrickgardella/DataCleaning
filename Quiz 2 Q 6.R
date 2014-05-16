@@ -11,4 +11,9 @@ if (!file.exists(fileName)) {
   dateDownloaded <- date()
 }
 
-DT <- fread(fileName)
+sst <- read.fwf(
+  file=fileName,
+  skip=4,
+  widths=c(12, 7,4, 9,4, 9,4, 9,4))
+
+print(sum(sst$V4))
